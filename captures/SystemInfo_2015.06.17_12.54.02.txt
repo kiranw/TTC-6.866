@@ -1,0 +1,35 @@
+TASK com.example.viewfinder id=45
+  ACTIVITY com.example.viewfinder/.MainActivity 2c3001dc pid=4773
+    Local Activity 1b517ca0 State:
+      mResumed=true mStopped=false mFinished=false
+      mLoadersStarted=true
+      mChangingConfigurations=false
+      mCurrentConfig={0 0.89 311mcc480mnc en_US ldltr sw360dp w640dp h335dp 480dpi nrml long land finger -keyb/v/h -nav/h s.31}
+      mMultiWindowStyle=MultiWindowStyle{type=0, zone=ZONE_UNKNOWN, option=0x00000000, bounds=null, isNull=false, isolatedCenterPoint=Point(0, 0), scale=0.0, specificTaskId=-1}
+    FragmentManager misc state:
+      mActivity=com.example.viewfinder.MainActivity@1b517ca0
+      mContainer=android.app.Activity$1@396b0059
+      mCurState=5 mStateSaved=false mDestroyed=false
+    ViewRoot:
+      mAdded=true mRemoved=false
+      mConsumeBatchedInputScheduled=true
+      mConsumeBatchedInputImmediatelyScheduled=false
+      mPendingInputEventCount=0
+      mProcessInputEventsScheduled=false
+      mTraversalScheduled=true (barrier=1533)
+      android.view.ViewRootImpl$NativePreImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$ImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$NativePostImeInputStage: mQueueLength=0
+    Choreographer:
+      mFrameScheduled=true
+      mLastFrameTime=22204363 (141 ms ago)
+    View Hierarchy:
+      com.android.internal.policy.impl.PhoneWindow$DecorView{2a80741e V.E..... R......D 0,0-1920,1080}
+        android.widget.LinearLayout{2946c4ff V.E..... .......D 0,0-1920,1080}
+          android.view.ViewStub{3f61c2cc G.E..... ......I. 0,0-0,0 #102043a}
+          android.widget.FrameLayout{3bc24915 V.E..... .......D 0,0-1920,1080 #1020002 android:id/content}
+            com.example.viewfinder.Preview{3f3bb42a V.E..... ........ 0,0-1920,1080}
+            com.example.viewfinder.DrawOnTop{1fccb21b V.ED.... ......ID 0,0-1920,1080}
+    Looper (main, tid 1) {44e3fb8}
+      Message 0: { when=-24ms barrier=1533 }
+      (Total messages: 1, idling=false, quitting=false)
