@@ -190,6 +190,7 @@ public class MainActivity extends Activity
         float brightnessMean;	// computed results
         float brightnessDeltaMean; // computed results
 		double redStdDev, greenStdDev, blueStdDev;
+        int totalBrightness;
         float prevBrightnessMean;
 		String TAG = "DrawOnTop";       // for logcat output
 
@@ -244,24 +245,22 @@ public class MainActivity extends Activity
 				super.onDraw(canvas);
 				return;	// because not yet set up
 			}
-            counter += 1;
-            Log.w(TAG, "counter: " + String.format("%4d", (int) counter));
 
             if (counter > 1) {
-                prevBrightness = brightness;
-                int totalBrightness = 0;
+                prevBrightness = new float[480*640];
+                System.arraycopy( brightness, 0, prevBrightness, 0, 480*640);
+
+                totalBrightness = 0;
                 for (int i = 0; i < 480*640; i++){
                     totalBrightness+= prevBrightness[i];
                 }
-                Log.w(TAG, "brightness: " + String.format("%4d", (int) totalBrightness));
             }
+
+            counter += 1;
+            Log.w(TAG, "counter: " + String.format("%4d", (int) counter));
 
 			// Convert image from YUV to RGB format:
 			decodeYUV420SP(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
-
-            // Calculate the brightness gradient;
-            calculateBrightnessDifference(counter, brightness, prevBrightness, deltaBrightness, nPixels,
-                                        brightnessDeltaMean, prevBrightnessMean);
 
 			// Now do some image processing here:
 
@@ -271,6 +270,20 @@ public class MainActivity extends Activity
 
 			// calculate means and standard deviations
 			calculateMeanAndStDev(mRedHistogram, mGreenHistogram, mBlueHistogram, mImageWidth * mImageHeight, brightness);
+
+            float sum = 0;
+            for (int i=0; i < nPixels; i++) {
+                sum = sum + prevBrightness[i];
+            }
+            prevBrightnessMean = sum / nPixels;
+
+            // Calculate brightness difference
+            sum = 0;
+            for (int i=0; i < nPixels; i++) {
+                deltaBrightness[i] = brightness[i] - prevBrightness[i];
+                sum += deltaBrightness[i];
+            }
+            brightnessDeltaMean = sum / (nPixels);
 
 			// Finally, use the results to draw things on top of screen:
 			int canvasHeight = canvas.getHeight();
@@ -288,10 +301,13 @@ public class MainActivity extends Activity
 			drawTextOnBlack(canvas, imageStdDevStr, marginWidth+10, 2 * mLeading, mPaintYellow);
             String imageBrightnessStr = "Brightness: " + String.format("%4d", (int) brightnessMean);
             drawTextOnBlack(canvas, imageBrightnessStr, marginWidth+10, 3 * mLeading, mPaintGreen);
-            String imageBrightnessDeltaStr = "PrevMean: " + String.format("%s", (float) prevBrightnessMean);
+            String imageBrightnessDeltaStr = "PrevBrightnessMean: " + String.format("%s", (float) prevBrightnessMean);
             drawTextOnBlack(canvas, imageBrightnessDeltaStr, marginWidth+10, 4 * mLeading, mPaintGreen);
-            String counterStr = String.format("%4d", (int) counter);
-            drawTextOnBlack(canvas, counterStr, marginWidth + 10, 5 * mLeading, mPaintGreen);
+            String brightnessDeltaMeanStr = "BrightnessDeltaMean: " + String.format("%s", (float) brightnessDeltaMean);
+            drawTextOnBlack(canvas, brightnessDeltaMeanStr, marginWidth+10, 5 * mLeading, mPaintGreen);
+
+//            String counterStr = String.format("%4d", (int) counter);
+//            drawTextOnBlack(canvas, counterStr, marginWidth + 10, 6 * mLeading, mPaintGreen);
 
 			float barWidth = ((float) newImageWidth) / 256;
 			// Draw red intensity histogram
@@ -350,31 +366,6 @@ public class MainActivity extends Activity
                 rgb[pix] = 0xFF000000 | (y << 16) | (y << 8) | y;
             } 
         }
-
-        // calculate the difference between previous brightness and current
-        public void calculateBrightnessDifference(int counter, float[] brightness, float[] prevBrightness, float[] deltaBrightness, int nPixels, float brightnessDeltaMean, float prevBrightnessMean)
-        {
-            if (counter <= 1) // null when counter is at 0, need to flood brightness first with values
-            {
-                prevBrightness = brightness;
-            }
-
-            float sum = 0;
-            for (int i=0; i < nPixels; i++) {
-                sum = sum + prevBrightness[i];
-            }
-            Log.w("prevBrightness total: ", String.format("%s", (float) sum));
-            prevBrightnessMean = sum / nPixels;
-
-            sum = 0;
-            for (int i=0; i < nPixels; i++) {
-                deltaBrightness[i] = brightness[i] - prevBrightness[i];
-                sum += deltaBrightness[i];
-            }
-            brightnessDeltaMean = sum / (nPixels);
-        }
-
-
 
         // This is where we finally actually do some "image processing"!
 		public void calculateIntensityHistograms(int[] rgb, int[] redHistogram, int[] greenHistogram, int[] blueHistogram, int width, int height)
@@ -513,8 +504,6 @@ public class MainActivity extends Activity
                     String TAG = "onPreviewFrame";
                     if ((mDrawOnTop == null) || mFinished) return;
                     if (mDrawOnTop.mBitmap == null)  // need to initialize the drawOnTop companion?
-
-                        mDrawOnTop.counter += 1;
                         mDrawOnTop.prevBrightness = mDrawOnTop.brightness;
 
 						setupArrays(data, camera);
