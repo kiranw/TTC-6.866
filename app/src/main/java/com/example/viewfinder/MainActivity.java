@@ -174,6 +174,10 @@ public class MainActivity extends Activity
         float[] brightness;
         float[] prevBrightness;
         float[] deltaBrightness;
+        float[][] E;
+        float[][] prevE;
+        float[][] E_x;
+        float[][] E_y;
         int mImageWidth, mImageHeight;
         int[] mRedHistogram;
         int[] mGreenHistogram;
@@ -201,6 +205,10 @@ public class MainActivity extends Activity
             counter = 0;
             brightness = new float[480*640];
             prevBrightness = new float[480*640];
+            E = new float[480][640];
+            prevE = new float[480][640];
+            E_x = new float[480][640];
+            E_y = new float[480][640];
 
             mPaintBlack = makePaint(Color.BLACK);
             mPaintYellow = makePaint(Color.YELLOW);
@@ -271,6 +279,25 @@ public class MainActivity extends Activity
 			// calculate means and standard deviations
 			calculateMeanAndStDev(mRedHistogram, mGreenHistogram, mBlueHistogram, mImageWidth * mImageHeight, brightness);
 
+            // calculate E, prevE, E_x, E_y, E_t
+            float E_t = 1f / 15f;
+            for (int i=0; i < 480; i++){
+                for (int j=0; j < 640; j++){
+                    E[i][j] = brightness[i*640 + j];
+                    prevE[i][j] = prevBrightness[i*640 + j];
+                }
+            }
+            float ttc_sum = 0;
+            for (int a=0; a < 480; a++){
+                for (int b=0; b < 640; b++){
+                    E_x[a][b] = (a == 479) ? 0 :  E[a][b] - prevE[a+1][b];
+                    E_y[a][b] = (b == 639) ? 0 :  E[a][b] - prevE[a][b+1];
+                    ttc_sum += a*E_x[a][b] + b*E_y[a][b];
+                }
+            }
+            float ttc = -E_t / ttc_sum;
+
+
             float sum = 0;
             for (int i=0; i < nPixels; i++) {
                 sum = sum + prevBrightness[i];
@@ -303,8 +330,10 @@ public class MainActivity extends Activity
             drawTextOnBlack(canvas, imageBrightnessStr, marginWidth+10, 3 * mLeading, mPaintGreen);
             String imageBrightnessDeltaStr = "PrevBrightnessMean: " + String.format("%s", (float) prevBrightnessMean);
             drawTextOnBlack(canvas, imageBrightnessDeltaStr, marginWidth+10, 4 * mLeading, mPaintGreen);
-            String brightnessDeltaMeanStr = "BrightnessDeltaMean: " + String.format("%s", (float) brightnessDeltaMean);
-            drawTextOnBlack(canvas, brightnessDeltaMeanStr, marginWidth+10, 5 * mLeading, mPaintGreen);
+//            String brightnessDeltaMeanStr = "BrightnessDeltaMean: " + String.format("%s", (float) brightnessDeltaMean);
+//            drawTextOnBlack(canvas, brightnessDeltaMeanStr, marginWidth+10, 5 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, String.format("%s", ttc), marginWidth+10, 5 * mLeading, mPaintGreen);
+
 
 //            String counterStr = String.format("%4d", (int) counter);
 //            drawTextOnBlack(canvas, counterStr, marginWidth + 10, 6 * mLeading, mPaintGreen);
@@ -341,6 +370,7 @@ public class MainActivity extends Activity
                     int g = (y1192 - 833 * v - 400 * u);
                     int b = (y1192 + 2066 * u);
 
+                    
                     if (r < 0) r = 0;
                     else if (r > 0x3FFFF) r = 0x3FFFF;
                     if (g < 0) g = 0;
