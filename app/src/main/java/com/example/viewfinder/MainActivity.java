@@ -167,9 +167,13 @@ public class MainActivity extends Activity
 
 	class DrawOnTop extends View
 	{
+        int counter;
         Bitmap mBitmap;
         byte[] mYUVData;
         int[] mRGBData;
+        float[] brightness;
+        float[] prevBrightness;
+        float[] deltaBrightness;
         int mImageWidth, mImageHeight;
         int[] mRedHistogram;
         int[] mGreenHistogram;
@@ -182,13 +186,20 @@ public class MainActivity extends Activity
 		int mTextsize = 90;		// controls size of text on screen
 		int mLeading;			// spacing between text lines
         RectF barRect = new RectF();	// used in drawing histogram
-		double redMean, greenMean, blueMean;	// computed results
+		double redMean, greenMean, blueMean;
+        float brightnessMean;	// computed results
+        float brightnessDeltaMean; // computed results
 		double redStdDev, greenStdDev, blueStdDev;
+        float prevBrightnessMean;
 		String TAG = "DrawOnTop";       // for logcat output
 
 		public DrawOnTop (Context context)
 		{ // constructor
             super(context);
+
+            counter = 0;
+            brightness = new float[480*640];
+            prevBrightness = new float[480*640];
 
             mPaintBlack = makePaint(Color.BLACK);
             mPaintYellow = makePaint(Color.YELLOW);
@@ -199,6 +210,8 @@ public class MainActivity extends Activity
             mBitmap = null;	// will be set up later in Preview - PreviewCallback
             mYUVData = null;
             mRGBData = null;
+            deltaBrightness = null;
+
             mRedHistogram = new int[256];
             mGreenHistogram = new int[256];
             mBlueHistogram = new int[256];
@@ -229,11 +242,26 @@ public class MainActivity extends Activity
 			if (mBitmap == null) {	// sanity check
 				Log.w(TAG, "mBitMap is null");
 				super.onDraw(canvas);
-				return;	// because not yet set up 
+				return;	// because not yet set up
 			}
+            counter += 1;
+            Log.w(TAG, "counter: " + String.format("%4d", (int) counter));
+
+            if (counter > 1) {
+                prevBrightness = brightness;
+                int totalBrightness = 0;
+                for (int i = 0; i < 480*640; i++){
+                    totalBrightness+= prevBrightness[i];
+                }
+                Log.w(TAG, "brightness: " + String.format("%4d", (int) totalBrightness));
+            }
 
 			// Convert image from YUV to RGB format:
-			decodeYUV420SP(mRGBData, mYUVData, mImageWidth, mImageHeight);
+			decodeYUV420SP(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
+
+            // Calculate the brightness gradient;
+            calculateBrightnessDifference(counter, brightness, prevBrightness, deltaBrightness, nPixels,
+                                        brightnessDeltaMean, prevBrightnessMean);
 
 			// Now do some image processing here:
 
@@ -242,7 +270,7 @@ public class MainActivity extends Activity
 										 mImageWidth, mImageHeight);
 
 			// calculate means and standard deviations
-			calculateMeanAndStDev(mRedHistogram, mGreenHistogram, mBlueHistogram, mImageWidth * mImageHeight);
+			calculateMeanAndStDev(mRedHistogram, mGreenHistogram, mBlueHistogram, mImageWidth * mImageHeight, brightness);
 
 			// Finally, use the results to draw things on top of screen:
 			int canvasHeight = canvas.getHeight();
@@ -258,6 +286,12 @@ public class MainActivity extends Activity
 			String imageStdDevStr = "Std Dev (R,G,B): " + String.format("%4d", (int) redStdDev) + ", " +
 									String.format("%4d", (int) greenStdDev) + ", " + String.format("%4d", (int) blueStdDev);
 			drawTextOnBlack(canvas, imageStdDevStr, marginWidth+10, 2 * mLeading, mPaintYellow);
+            String imageBrightnessStr = "Brightness: " + String.format("%4d", (int) brightnessMean);
+            drawTextOnBlack(canvas, imageBrightnessStr, marginWidth+10, 3 * mLeading, mPaintGreen);
+            String imageBrightnessDeltaStr = "PrevMean: " + String.format("%s", (float) prevBrightnessMean);
+            drawTextOnBlack(canvas, imageBrightnessDeltaStr, marginWidth+10, 4 * mLeading, mPaintGreen);
+            String counterStr = String.format("%4d", (int) counter);
+            drawTextOnBlack(canvas, counterStr, marginWidth + 10, 5 * mLeading, mPaintGreen);
 
 			float barWidth = ((float) newImageWidth) / 256;
 			// Draw red intensity histogram
@@ -271,7 +305,7 @@ public class MainActivity extends Activity
 
 		} // end onDraw method
 
-		public void decodeYUV420SP (int[] rgb, byte[] yuv420sp, int width, int height)
+		public void decodeYUV420SP (int[] rgb, float[] brightness, byte[] yuv420sp, int width, int height)
 		{ // convert image in YUV420SP format to RGB format
             final int frameSize = width * height;
 
@@ -299,6 +333,7 @@ public class MainActivity extends Activity
                     else if (b > 0x3FFFF) b = 0x3FFFF;
 
                     rgb[pix] = 0xFF000000 | ((r << 6) & 0xFF0000) | ((g >> 2) & 0xFF00) | ((b >> 10) & 0xFF);
+                    brightness[pix] = (r * 0.2126f + g * 0.7152f + b * 0.0722f) / 255;
                 }
             }
         }
@@ -316,8 +351,32 @@ public class MainActivity extends Activity
             } 
         }
 
-        // This is where we finally actually do some "image processing"!
+        // calculate the difference between previous brightness and current
+        public void calculateBrightnessDifference(int counter, float[] brightness, float[] prevBrightness, float[] deltaBrightness, int nPixels, float brightnessDeltaMean, float prevBrightnessMean)
+        {
+            if (counter <= 1) // null when counter is at 0, need to flood brightness first with values
+            {
+                prevBrightness = brightness;
+            }
 
+            float sum = 0;
+            for (int i=0; i < nPixels; i++) {
+                sum = sum + prevBrightness[i];
+            }
+            Log.w("prevBrightness total: ", String.format("%s", (float) sum));
+            prevBrightnessMean = sum / nPixels;
+
+            sum = 0;
+            for (int i=0; i < nPixels; i++) {
+                deltaBrightness[i] = brightness[i] - prevBrightness[i];
+                sum += deltaBrightness[i];
+            }
+            brightnessDeltaMean = sum / (nPixels);
+        }
+
+
+
+        // This is where we finally actually do some "image processing"!
 		public void calculateIntensityHistograms(int[] rgb, int[] redHistogram, int[] greenHistogram, int[] blueHistogram, int width, int height)
 		{
             final int dpix = 1;
@@ -340,7 +399,7 @@ public class MainActivity extends Activity
             }
 		}
 	
-		private void calculateMeanAndStDev (int mRedHistogram[], int mGreenHistogram[], int mBlueHistogram[], int nPixels)
+		private void calculateMeanAndStDev (int mRedHistogram[], int mGreenHistogram[], int mBlueHistogram[], int nPixels, float[] brightness)
 		{
 			// Calculate first and second moments (zeroth moment equals nPixels)
 			double red1stMoment = 0, green1stMoment = 0, blue1stMoment = 0;
@@ -357,7 +416,13 @@ public class MainActivity extends Activity
 
 			} // bin
 
-			redMean   = red1stMoment   / nPixels;
+            float sum = 0;
+            for (int i=0; i < nPixels; i++) {
+                sum = sum + brightness[i];
+            }
+            brightnessMean = sum / nPixels;
+
+            redMean   = red1stMoment   / nPixels;
 			greenMean = green1stMoment / nPixels;
 			blueMean  = blue1stMoment  / nPixels;
 
@@ -442,12 +507,16 @@ public class MainActivity extends Activity
                     break;
             }
 			if (DBG) Log.i(TAG, "Camera "+mCam+" orientation "+info.orientation);
-			
+
             mPreviewCallback = new PreviewCallback() {
                 public void onPreviewFrame(byte[] data, Camera camera) { // callback
                     String TAG = "onPreviewFrame";
                     if ((mDrawOnTop == null) || mFinished) return;
                     if (mDrawOnTop.mBitmap == null)  // need to initialize the drawOnTop companion?
+
+                        mDrawOnTop.counter += 1;
+                        mDrawOnTop.prevBrightness = mDrawOnTop.brightness;
+
 						setupArrays(data, camera);
                     // Pass YUV image data to draw-on-top companion
                     System.arraycopy(data, 0, mDrawOnTop.mYUVData, 0, data.length);
@@ -512,6 +581,10 @@ public class MainActivity extends Activity
 		{
 			String TAG="setupArrays";
 			if (DBG) Log.i(TAG, "Setting up arrays");
+//            mDrawOnTop.counter += 1;
+//            mDrawOnTop.prevBrightness = mDrawOnTop.brightness;
+//            mDrawOnTop.brightness = new float[mDrawOnTop.mImageWidth * mDrawOnTop.mImageHeight];
+
 			Camera.Parameters params = camera.getParameters();
 			mDrawOnTop.mImageHeight = params.getPreviewSize().height;
 			mDrawOnTop.mImageWidth = params.getPreviewSize().width;
@@ -519,6 +592,7 @@ public class MainActivity extends Activity
 			mDrawOnTop.mBitmap = Bitmap.createBitmap(mDrawOnTop.mImageWidth,
 				mDrawOnTop.mImageHeight, Bitmap.Config.RGB_565);
 			mDrawOnTop.mRGBData = new int[mDrawOnTop.mImageWidth * mDrawOnTop.mImageHeight];
+            mDrawOnTop.deltaBrightness = new float[mDrawOnTop.mImageWidth * mDrawOnTop.mImageHeight];
 			if (DBG) Log.i(TAG, "data length " + data.length); // should be width*height*3/2 for YUV format
 			mDrawOnTop.mYUVData = new byte[data.length];
 			int dataLengthExpected = mDrawOnTop.mImageWidth * mDrawOnTop.mImageHeight * 3 / 2;

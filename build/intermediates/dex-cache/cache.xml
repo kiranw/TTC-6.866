@@ -2,32 +2,58 @@
 <items version="2" >
 
     <item
-        jar="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\classes.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
         revision="22.0.1"
         sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\pre-dexed\debug\classes-eadbff07302bb3b96bc44463153e22448eaeb7c0.jar" />
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-22.2.0_363ff1b6bf9c366882cbfe871038c471b0784593/classes.dex" />
     </item>
     <item
-        jar="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
         revision="22.0.1"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\pre-dexed\debug\classes-72fb8cd12143082d3355fa29d83f173c6d87e869.jar" />
+        sha1="31254507d40867f6ffedc6c566bbb07c796ad265">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_aa2674d7142e7c72931b2d409a5ec21c1adff03c/classes.dex" />
     </item>
     <item
-        jar="C:\AndroidStudio\SDK\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
         revision="22.0.1"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-3c0f50b85431a575f9a7d910d19784a0be864296.jar" />
+        sha1="1ef35fadfd7055399e5fdb5934e4df81717516b4">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_7ff3df09e96ffcae4400ae7d59341e107d6dff40/classes.dex" />
     </item>
     <item
-        jar="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
+        jumboMode="true"
+        optimize="true"
         revision="22.0.1"
         sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="C:\AndroidstudioProjects\ViewFinder\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-f0cb6c79463a275dde141ec6de697c951c25ec80.jar" />
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-22.2.0_554de17f11d67eae83b2a2a9c168100a2e1f669d/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-22.2.0_89ebb2aa9d0cb23efa425af0d66db2a6fff7c0c7/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/kiran/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="22.0.1"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-22.2.0_d0f13cc60b41483561d62482cd6351cd24619e08/classes.dex" />
     </item>
 
 </items>
