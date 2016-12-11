@@ -16,7 +16,7 @@
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
-        sha1="7210a40f1de56e7dd7ccb6428fad74e7dd4a87be">
+        sha1="358c20e199c5e047db234c9276884008ccd8027e">
         <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_b750ef04cac4aca494e068ce83d6a300187e2af6/classes.dex" />
     </item>
     <item
@@ -25,7 +25,7 @@
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
-        sha1="b9f49380370abdafb00f7b2318b2608aca8add6f">
+        sha1="5bf0fccc9a02586cad302ba385197023a1ce2194">
         <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_0e1a9fb42e1d8dadd4ee176067c12bee2eb91e2f/classes.dex" />
     </item>
     <item

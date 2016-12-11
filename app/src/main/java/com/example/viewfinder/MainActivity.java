@@ -289,19 +289,65 @@ public class MainActivity extends Activity
                 }
             }
             float ttc_sum = 0;
-            float g_squared = 0;
+            float sum_g_squared = 0;
+            float sum_ex_ey = 0;
+            float sum_g_ex = 0;
+            float sum_g_ey = 0;
+            float sum_g_et = 0;
+            float sum_ex_squared = 0;
+            float sum_ey_squared = 0;
+            float sum_ey_et = 0;
+            float sum_ex_et = 0;
+            float sum_g_squared_x_y = 0;
+            float sum_g_x_et = 0;
+            float sum_g_y_et = 0;
+            float sum_g_squared_x = 0;
+            float sum_g_squared_y = 0;
+            float sum_g_squared_x_squared = 0;
+            float sum_g_squared_y_squared = 0;
+
             for (int a=0; a < 480; a++){
                 for (int b=0; b < 640; b++){
                     E_x[a][b] = (a == 479) ? 0 :  E[a][b] - prevE[a+1][b];
                     E_y[a][b] = (b == 639) ? 0 :  E[a][b] - prevE[a][b+1];
                     float G = a*E_x[a][b] + b*E_y[a][b];
                     ttc_sum += G;
-                    g_squared += G*G;
+                    sum_g_squared += G*G;
+                    sum_ex_ey += E_x[a][b] * E_y[a][b];
+                    sum_g_ex += G * E_x[a][b];
+                    sum_g_ey += G * E_y[a][b];
+                    sum_g_et += G * E_t;
+                    sum_ex_squared += E_x[a][b] * E_x[a][b];
+                    sum_ey_squared += E_y[a][b] * E_y[a][b];
+                    sum_ey_et += E_y[a][b] * E_t;
+                    sum_ex_et += E_x[a][b] * E_t;
+                    sum_g_squared_x_y += G * G * a * b;
+                    sum_g_x_et += G * a * E_t;
+                    sum_g_y_et += G * b * E_t;
+                    sum_g_squared_x += G * G * a;
+                    sum_g_squared_y += G * G * b;
+                    sum_g_squared_x_squared += G * G * a * a;
+                    sum_g_squared_y_squared += G * G * b * b;
                 }
             }
             //float ttc = -E_t / ttc_sum;
-            float ttc = - g_squared / (ttc_sum * E_t);
+            float ttc = - sum_g_squared / (ttc_sum * E_t);
 
+            //method 2
+            float numerator1 = (-sum_g_et*sum_ex_ey + sum_ey_et*sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
+            float numerator2 = (-sum_ey_et * sum_ex_squared + sum_ex_et * sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
+            float denom1 = (sum_g_squared*sum_ex_ey - sum_g_ey * sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
+            float denom2 = (sum_g_ey*sum_ex_squared - sum_g_ex*sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
+            float c2 = (numerator1-numerator2)/(denom1-denom2);
+            float ttc2 = 1/c2;
+
+            //method 3
+            float numerator1_1 = (-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y);
+            float numerator1_2 = (-sum_g_y_et*sum_g_squared_x_squared+sum_g_x_et*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x_squared);
+            float denom1_1 = (sum_g_squared*sum_g_squared_x_y-sum_g_squared_y*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared - sum_g_squared_x_y*sum_g_squared_x_y);
+            float denom1_2 = (sum_g_squared_y*sum_g_squared_x_squared-sum_g_squared_x*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x);
+            float c3 = (numerator1_1-numerator1_2)/(denom1_1-denom1_2);
+            float ttc3 = 1/c3;
 
             float sum = 0;
             for (int i=0; i < nPixels; i++) {
@@ -338,6 +384,8 @@ public class MainActivity extends Activity
 //            String brightnessDeltaMeanStr = "BrightnessDeltaMean: " + String.format("%s", (float) brightnessDeltaMean);
 //            drawTextOnBlack(canvas, brightnessDeltaMeanStr, marginWidth+10, 5 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, String.format("%s", ttc), marginWidth+10, 5 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, String.format("%s", ttc2), marginWidth+10, 6 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, String.format("%s", ttc3), marginWidth+10, 7 * mLeading, mPaintGreen);
 
 
 //            String counterStr = String.format("%4d", (int) counter);
