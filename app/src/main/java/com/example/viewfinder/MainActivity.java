@@ -348,14 +348,19 @@ public class MainActivity extends Activity
             float n_b2_2 = -sum_g_et*sum_ex_ey+sum_ey_et*sum_g_ex-c2*(sum_g_squared*sum_ex_ey-sum_g_ey*sum_g_ex);
             float d_b2_2 = sum_g_ey*sum_ex_ey-sum_ey_squared*sum_g_ex;
 
-            //these should be equal
+            //these are equal (sanity check)
             float b2_1 = n_b2_1/d_b2_1;
             float b2_2 = n_b2_2/d_b2_2;
+            //Log.w("b2_1: ", String.valueOf(b2_1));
+            //Log.w("b2_2: ", String.valueOf(b2_2));
 
-            //these should be equal
+            //these are equal (sanity check)
             float a2_1 = (-sum_ex_et - b2_1*sum_ex_ey - c2*sum_g_ex)/sum_ex_squared;
             float a2_2 = (-sum_ey_et - b2_1*sum_ey_squared - c2*sum_g_ey)/sum_ex_ey;
-            float a3_3 = (-sum_g_et - b2_1*sum_g_ey - c2*sum_g_squared)/sum_g_ex;
+            float a2_3 = (-sum_g_et - b2_1*sum_g_ey - c2*sum_g_squared)/sum_g_ex;
+            //Log.w("a2_1: ", String.valueOf(a2_1));
+            //Log.w("a2_2: ", String.valueOf(a2_2));
+            //Log.w("a2_3: ", String.valueOf(a2_3));
 
             //FOE
             float x_0 = -a2_1 / c2;
