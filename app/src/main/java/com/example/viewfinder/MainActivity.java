@@ -321,13 +321,13 @@ public class MainActivity extends Activity
                     sum_ey_squared += E_y[a][b] * E_y[a][b];
                     sum_ey_et += E_y[a][b] * E_t;
                     sum_ex_et += E_x[a][b] * E_t;
-                    sum_g_squared_x_y += G * G * a/100 * b/100;
-                    sum_g_x_et += G * a/100 * E_t;
-                    sum_g_y_et += G * b/100 * E_t;
-                    sum_g_squared_x += G * G * a/100;
-                    sum_g_squared_y += G * G * b/100;
-                    sum_g_squared_x_squared += G * G * a/100 * a/100;
-                    sum_g_squared_y_squared += G * G * b/100 * b/100;
+                    sum_g_squared_x_y += G * G * (a/100) * (b/100);
+                    sum_g_x_et += G * (a/100) * E_t;
+                    sum_g_y_et += G * (b/100) * E_t;
+                    sum_g_squared_x += G * G * (a/100);
+                    sum_g_squared_y += G * G * (b/100);
+                    sum_g_squared_x_squared += G * G * (a/100) * (a/100);
+                    sum_g_squared_y_squared += G * G * (b/100) * (b/100);
                 }
             }
 
@@ -335,12 +335,32 @@ public class MainActivity extends Activity
             float ttc = - sum_g_squared / (ttc_sum * E_t);
 
             //method 2
-            float numerator1 = (-sum_g_et*sum_ex_ey + sum_ey_et*sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
-            float numerator2 = (-sum_ey_et * sum_ex_squared + sum_ex_et * sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
-            float denom1 = (sum_g_squared*sum_ex_ey - sum_g_ey * sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
-            float denom2 = (sum_g_ey*sum_ex_squared - sum_g_ex*sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
-            float c2 = (numerator1-numerator2)/(denom1-denom2);
+            float n1_c2 = (-sum_g_et*sum_ex_ey + sum_ey_et*sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
+            float n2_c2 = (-sum_ey_et * sum_ex_squared + sum_ex_et * sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
+            float d1_c2 = (sum_g_squared*sum_ex_ey - sum_g_ey * sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
+            float d2_c2 = (sum_g_ey*sum_ex_squared - sum_g_ex*sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
+            float c2 = (n1_c2-n2_c2)/(d1_c2-d2_c2);
             float ttc2 = 1/c2;
+
+            float n_b2_1 = -sum_ey_et*sum_ex_squared + sum_ex_et*sum_ex_ey - c2*(sum_g_ey*sum_ex_squared-sum_g_ex*sum_ex_ey);
+            float d_b2_1 = (sum_ex_squared*sum_ey_squared-sum_ex_ey*sum_ex_ey);
+
+            float n_b2_2 = -sum_g_et*sum_ex_ey+sum_ey_et*sum_g_ex-c2*(sum_g_squared*sum_ex_ey-sum_g_ey*sum_g_ex);
+            float d_b2_2 = sum_g_ey*sum_ex_ey-sum_ey_squared*sum_g_ex;
+
+            //these should be equal
+            float b2_1 = n_b2_1/d_b2_1;
+            float b2_2 = n_b2_2/d_b2_2;
+
+            //these should be equal
+            float a2_1 = (-sum_ex_et - b2_1*sum_ex_ey - c2*sum_g_ex)/sum_ex_squared;
+            float a2_2 = (-sum_ey_et - b2_1*sum_ey_squared - c2*sum_g_ey)/sum_ex_ey;
+            float a3_3 = (-sum_g_et - b2_1*sum_g_ey - c2*sum_g_squared)/sum_g_ex;
+
+            //FOE
+            float x_0 = -a2_1 / c2;
+            float y_0 = -b2_1 / c2;
+
 
             //method 3
             double numerator1_1 = (-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y);
@@ -377,6 +397,8 @@ public class MainActivity extends Activity
             drawTextOnBlack(canvas, "TTC1: " + String.format("%s", ttc), marginWidth+10, 3 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "TTC2: " + String.format("%s", ttc2), marginWidth+10, 4 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "TTC3: " + String.format("%s", ttc3), marginWidth+10, 5 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, "FOE_x: " + String.format("%s", x_0), marginWidth+10, 6 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, "FOE_y: " + String.format("%s", y_0), marginWidth+10, 7 * mLeading, mPaintGreen);
 
 
 			float barWidth = ((float) newImageWidth) / 25;
