@@ -330,16 +330,8 @@ public class MainActivity extends Activity
                     sum_g_squared_y_squared += G * G * b/100 * b/100;
                 }
             }
-            float[] numbers = {ttc_sum, sum_g_squared, sum_ex_ey, sum_g_ex, sum_g_ey, sum_g_et, sum_ex_squared, sum_ey_squared, sum_ey_et, sum_ex_et, sum_g_squared_x_y, sum_g_x_et, sum_g_y_et, sum_g_squared_x, sum_g_squared_y, sum_g_squared_x_squared, sum_g_squared_y_squared};
-            String[] names = {"ttc_sum", "sum_g_squared", "sum_ex_ey", "sum_g_ex", "sum_g_ey", "sum_g_et", "sum_ex_squared", "sum_ey_squared", "sum_ey_et", "sum_ex_et", "sum_g_squared_x_y", "sum_g_x_et", "sum_g_y_et", "sum_g_squared_x", "sum_g_squared_y", "sum_g_squared_x_squared", "sum_g_squared_y_squared"};
-            for (int i = 0; i < 17; i++){
-                if (Float.isNaN(numbers[i])){
-                    Log.w("incorrect term", names[i]);
-                }
-            }
 
-
-            //float ttc = -E_t / ttc_sum;
+            //method 1
             float ttc = - sum_g_squared / (ttc_sum * E_t);
 
             //method 2
@@ -351,23 +343,11 @@ public class MainActivity extends Activity
             float ttc2 = 1/c2;
 
             //method 3
-//            double numerator0_1 = (-sum_g_et*sum_g_squared_x_y)/(1e16);
-//            numerator0_1 += (sum_g_y_et*sum_g_squared_x)/(1e16);
             double numerator1_1 = (-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y);
-            Log.w("terms1", String.valueOf(-sum_g_et*sum_g_squared_x_y));
-            Log.w("terms2", String.valueOf(sum_g_y_et*sum_g_squared_x));
-            Log.w("terms3", String.valueOf(sum_g_squared_y_squared*sum_g_squared_x_squared));
-            Log.w("terms4", String.valueOf(sum_g_squared_x_y*sum_g_squared_x_y));
-            Log.w("terms5", String.valueOf((-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)));
-            Log.w("terms6", String.valueOf((sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y)));
-            Log.w("terms7", String.valueOf(numerator1_1));
             double numerator1_2 = (-sum_g_y_et*sum_g_squared_x_squared+sum_g_x_et*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x_squared);
-            Log.w("method3 numerator", String.valueOf(numerator1_1 - numerator1_2));
             double denom1_1 = (sum_g_squared*sum_g_squared_x_y-sum_g_squared_y*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared - sum_g_squared_x_y*sum_g_squared_x_y);
             double denom1_2 = (sum_g_squared_y*sum_g_squared_x_squared-sum_g_squared_x*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x);
-            Log.w("method3 denominator", String.valueOf(numerator1_1 - numerator1_2));
             double c3 = (numerator1_1-numerator1_2)/(denom1_1-denom1_2);
-            Log.w("method3 c", String.valueOf(c3));
             double ttc3 = 1/c3;
 
             float sum = 0;
