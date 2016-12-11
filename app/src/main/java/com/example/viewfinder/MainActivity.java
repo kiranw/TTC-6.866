@@ -288,6 +288,43 @@ public class MainActivity extends Activity
                     prevE[i][j] = prevBrightness[i*640 + j];
                 }
             }
+
+            // calculate differences in brightness
+            for (int a=0; a < 480; a++) {
+                for (int b = 0; b < 640; b++) {
+                    E_x[a][b] = (a == 479) ? 0 : E[a][b] - prevE[a + 1][b];
+                    E_y[a][b] = (b == 639) ? 0 : E[a][b] - prevE[a][b + 1];
+                }
+            }
+
+
+            // subsample
+            float[][] subE_x = new float[120][160];
+            float[][] subE_y = new float[120][160];
+            int newX = -1;
+            int newY;
+            for (int a=0; a < 480; a=a+4) {
+                newY = -1;
+                newX++;
+                for (int b = 0; b < 640; b = b + 4) {
+                    newY++;
+                    int xEnd = Math.min(480, a + 4);
+                    int yEnd = Math.min(640, b + 4);
+                    float xAvg = 0;
+                    float yAvg = 0;
+                    for (int xStart = a; xStart < xEnd; xStart++) {
+                        for (int yStart = b; yStart < yEnd; yStart++) {
+                            xAvg += E_x[xStart][yStart];
+                            yAvg += E_y[xStart][yStart];
+                        }
+                    }
+                    xAvg /= ((xEnd - a) * (yEnd - b));
+                    yAvg /= ((xEnd - a) * (yEnd - b));
+                    subE_x[newX][newY] = xAvg;
+                    subE_y[newX][newY] = yAvg;
+                }
+            }
+
             float ttc_sum = 0;
             float sum_g_squared = 0;
             float sum_ex_ey = 0;
@@ -306,21 +343,19 @@ public class MainActivity extends Activity
             float sum_g_squared_x_squared = 0;
             float sum_g_squared_y_squared = 0;
 
-            for (int a=0; a < 480; a++){
-                for (int b=0; b < 640; b++){
-                    E_x[a][b] = (a == 479) ? 0 :  E[a][b] - prevE[a+1][b];
-                    E_y[a][b] = (b == 639) ? 0 :  E[a][b] - prevE[a][b+1];
-                    float G = a/100*E_x[a][b] + b/100*E_y[a][b];
+            for (int a=0; a < 120; a++){
+                for (int b=0; b < 160; b++){
+                    float G = a/100*subE_x[a][b] + b/100*subE_y[a][b];
                     ttc_sum += G;
                     sum_g_squared += G*G;
-                    sum_ex_ey += E_x[a][b] * E_y[a][b];
-                    sum_g_ex += G * E_x[a][b];
-                    sum_g_ey += G * E_y[a][b];
+                    sum_ex_ey += subE_x[a][b] * subE_y[a][b];
+                    sum_g_ex += G * subE_x[a][b];
+                    sum_g_ey += G * subE_y[a][b];
                     sum_g_et += G * E_t;
-                    sum_ex_squared += E_x[a][b] * E_x[a][b];
-                    sum_ey_squared += E_y[a][b] * E_y[a][b];
-                    sum_ey_et += E_y[a][b] * E_t;
-                    sum_ex_et += E_x[a][b] * E_t;
+                    sum_ex_squared += subE_x[a][b] * subE_x[a][b];
+                    sum_ey_squared += subE_y[a][b] * subE_y[a][b];
+                    sum_ey_et += subE_y[a][b] * E_t;
+                    sum_ex_et += subE_x[a][b] * E_t;
                     sum_g_squared_x_y += G * G * (a/100) * (b/100);
                     sum_g_x_et += G * (a/100) * E_t;
                     sum_g_y_et += G * (b/100) * E_t;
@@ -363,8 +398,8 @@ public class MainActivity extends Activity
             //Log.w("a2_3: ", String.valueOf(a2_3));
 
             //FOE
-            float x_0 = -a2_1 / c2;
-            float y_0 = -b2_1 / c2;
+            float x_0 = -a2_1 / c2*100;
+            float y_0 = -b2_1 / c2*100;
 
 
             //method 3
@@ -413,6 +448,7 @@ public class MainActivity extends Activity
             drawTTCBar(canvas, mPaintRed, ttc, canvasHeight, left1, barWidth);
             drawTTCBar(canvas, mPaintYellow, ttc2, canvasHeight, left2, barWidth);
             drawTTCBar(canvas, mPaintGreen, (float) ttc3, canvasHeight, left3*50, barWidth);
+            drawFOE(canvas, mPaintRed, x_0, y_0, canvasHeight, newImageWidth);
             super.onDraw(canvas);
 
 		} // end onDraw method
@@ -563,6 +599,17 @@ public class MainActivity extends Activity
             barRect.right = barRect.left + barWidth;
             barRect.top = barRect.bottom - Math.min(600, ttc * barMaxHeight) - barMarginHeight;
             canvas.drawRect(barRect, mPaint);
+        }
+
+        void drawFOE(Canvas canvas, Paint mPaint, float x_0, float y_0, int canvasHeight, int newImageWidth) {
+            if (x_0 > 0 && y_0 > 0){
+                barRect.bottom = y_0/640 * canvasHeight;
+                barRect.top = barRect.bottom - 30;
+                barRect.left = x_0/480 * newImageWidth;
+                barRect.right = barRect.left + 30;
+                canvas.drawRect(barRect, mPaint);
+            }
+
         }
 	}
 
