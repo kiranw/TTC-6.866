@@ -268,7 +268,8 @@ public class MainActivity extends Activity
             Log.w(TAG, "counter: " + String.format("%4d", (int) counter));
 
 			// Convert image from YUV to RGB format:
-			decodeYUV420SP(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
+			//decodeYUV420SP(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
+            decodeYUV420SPGrayscale (mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
 
 			// Now do some image processing here:
 
@@ -288,14 +289,18 @@ public class MainActivity extends Activity
                 }
             }
             float ttc_sum = 0;
+            float g_squared = 0;
             for (int a=0; a < 480; a++){
                 for (int b=0; b < 640; b++){
                     E_x[a][b] = (a == 479) ? 0 :  E[a][b] - prevE[a+1][b];
                     E_y[a][b] = (b == 639) ? 0 :  E[a][b] - prevE[a][b+1];
-                    ttc_sum += a*E_x[a][b] + b*E_y[a][b];
+                    float G = a*E_x[a][b] + b*E_y[a][b];
+                    ttc_sum += G;
+                    g_squared += G*G;
                 }
             }
-            float ttc = -E_t / ttc_sum;
+            //float ttc = -E_t / ttc_sum;
+            float ttc = - g_squared / (ttc_sum * E_t);
 
 
             float sum = 0;
@@ -326,7 +331,7 @@ public class MainActivity extends Activity
 			String imageStdDevStr = "Std Dev (R,G,B): " + String.format("%4d", (int) redStdDev) + ", " +
 									String.format("%4d", (int) greenStdDev) + ", " + String.format("%4d", (int) blueStdDev);
 			drawTextOnBlack(canvas, imageStdDevStr, marginWidth+10, 2 * mLeading, mPaintYellow);
-            String imageBrightnessStr = "Brightness: " + String.format("%4d", (int) brightnessMean);
+            String imageBrightnessStr = "Brightness: " + String.format("%s", (float) brightnessMean);
             drawTextOnBlack(canvas, imageBrightnessStr, marginWidth+10, 3 * mLeading, mPaintGreen);
             String imageBrightnessDeltaStr = "PrevBrightnessMean: " + String.format("%s", (float) prevBrightnessMean);
             drawTextOnBlack(canvas, imageBrightnessDeltaStr, marginWidth+10, 4 * mLeading, mPaintGreen);
@@ -384,7 +389,7 @@ public class MainActivity extends Activity
             }
         }
 
-		public void decodeYUV420SPGrayscale (int[] rgb, byte[] yuv420sp, int width, int height)
+		public void decodeYUV420SPGrayscale (int[] rgb, float[] brightness, byte[] yuv420sp, int width, int height)
 		{ // extract grey RGB format image --- not used currently
 			final int frameSize = width * height;
 
@@ -394,6 +399,7 @@ public class MainActivity extends Activity
                 if (y < 0) y = 0;
                 if (y > 0xFF) y = 0xFF;
                 rgb[pix] = 0xFF000000 | (y << 16) | (y << 8) | y;
+                brightness[pix] = (float) y/255;
             } 
         }
 
