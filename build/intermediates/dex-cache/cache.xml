@@ -3,57 +3,57 @@
 
     <item
         is-multidex="true"
-        jar="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
         sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-22.2.0_22cb0ca648fef5ceb0ee2587405ebf1611f26cbe/classes.dex" />
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-22.2.0_363ff1b6bf9c366882cbfe871038c471b0784593/classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
-        sha1="358c20e199c5e047db234c9276884008ccd8027e">
-        <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_b750ef04cac4aca494e068ce83d6a300187e2af6/classes.dex" />
+        sha1="736f6cd0a768d689456080686ae45c9487ac2aa2">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_aa2674d7142e7c72931b2d409a5ec21c1adff03c/classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
-        sha1="5bf0fccc9a02586cad302ba385197023a1ce2194">
-        <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_0e1a9fb42e1d8dadd4ee176067c12bee2eb91e2f/classes.dex" />
+        sha1="03e46fafd3f7f3eb4543b0760450879ec973be55">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_7ff3df09e96ffcae4400ae7d59341e107d6dff40/classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
         sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-22.2.0_66299ec41186bbfc8597d35da4845dca3f792e87/classes.dex" />
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-22.2.0_554de17f11d67eae83b2a2a9c168100a2e1f669d/classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="/Users/christinasun/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="22.0.1"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-22.2.0_d112117c1984db91f15a1f4e0b467f9ad96b2c78/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
+        jar="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
         jumboMode="true"
         optimize="true"
         revision="22.0.1"
         sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="/Users/christinasun/Desktop/ttc/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-22.2.0_e8de49aeee87fe53f419165adb3324e747b1e051/classes.dex" />
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-22.2.0_89ebb2aa9d0cb23efa425af0d66db2a6fff7c0c7/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/kiran/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="22.0.1"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="/Users/kiran/Dropbox (MIT)/Semester 7/6.866/TTC-6.866/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-22.2.0_d0f13cc60b41483561d62482cd6351cd24619e08/classes.dex" />
     </item>
 
 </items>

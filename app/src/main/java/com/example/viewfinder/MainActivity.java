@@ -269,7 +269,7 @@ public class MainActivity extends Activity
 
 			// Convert image from YUV to RGB format:
 			//decodeYUV420SP(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
-            decodeYUV420SPGrayscale (mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
+            decodeYUV420SPGrayscale(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
 
 			// Now do some image processing here:
 
@@ -310,7 +310,7 @@ public class MainActivity extends Activity
                 for (int b=0; b < 640; b++){
                     E_x[a][b] = (a == 479) ? 0 :  E[a][b] - prevE[a+1][b];
                     E_y[a][b] = (b == 639) ? 0 :  E[a][b] - prevE[a][b+1];
-                    float G = a*E_x[a][b] + b*E_y[a][b];
+                    float G = a/100*E_x[a][b] + b/100*E_y[a][b];
                     ttc_sum += G;
                     sum_g_squared += G*G;
                     sum_ex_ey += E_x[a][b] * E_y[a][b];
@@ -321,15 +321,24 @@ public class MainActivity extends Activity
                     sum_ey_squared += E_y[a][b] * E_y[a][b];
                     sum_ey_et += E_y[a][b] * E_t;
                     sum_ex_et += E_x[a][b] * E_t;
-                    sum_g_squared_x_y += G * G * a * b;
-                    sum_g_x_et += G * a * E_t;
-                    sum_g_y_et += G * b * E_t;
-                    sum_g_squared_x += G * G * a;
-                    sum_g_squared_y += G * G * b;
-                    sum_g_squared_x_squared += G * G * a * a;
-                    sum_g_squared_y_squared += G * G * b * b;
+                    sum_g_squared_x_y += G * G * a/100 * b/100;
+                    sum_g_x_et += G * a/100 * E_t;
+                    sum_g_y_et += G * b/100 * E_t;
+                    sum_g_squared_x += G * G * a/100;
+                    sum_g_squared_y += G * G * b/100;
+                    sum_g_squared_x_squared += G * G * a/100 * a/100;
+                    sum_g_squared_y_squared += G * G * b/100 * b/100;
                 }
             }
+            float[] numbers = {ttc_sum, sum_g_squared, sum_ex_ey, sum_g_ex, sum_g_ey, sum_g_et, sum_ex_squared, sum_ey_squared, sum_ey_et, sum_ex_et, sum_g_squared_x_y, sum_g_x_et, sum_g_y_et, sum_g_squared_x, sum_g_squared_y, sum_g_squared_x_squared, sum_g_squared_y_squared};
+            String[] names = {"ttc_sum", "sum_g_squared", "sum_ex_ey", "sum_g_ex", "sum_g_ey", "sum_g_et", "sum_ex_squared", "sum_ey_squared", "sum_ey_et", "sum_ex_et", "sum_g_squared_x_y", "sum_g_x_et", "sum_g_y_et", "sum_g_squared_x", "sum_g_squared_y", "sum_g_squared_x_squared", "sum_g_squared_y_squared"};
+            for (int i = 0; i < 17; i++){
+                if (Float.isNaN(numbers[i])){
+                    Log.w("incorrect term", names[i]);
+                }
+            }
+
+
             //float ttc = -E_t / ttc_sum;
             float ttc = - sum_g_squared / (ttc_sum * E_t);
 
@@ -342,12 +351,24 @@ public class MainActivity extends Activity
             float ttc2 = 1/c2;
 
             //method 3
-            float numerator1_1 = (-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y);
-            float numerator1_2 = (-sum_g_y_et*sum_g_squared_x_squared+sum_g_x_et*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x_squared);
-            float denom1_1 = (sum_g_squared*sum_g_squared_x_y-sum_g_squared_y*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared - sum_g_squared_x_y*sum_g_squared_x_y);
-            float denom1_2 = (sum_g_squared_y*sum_g_squared_x_squared-sum_g_squared_x*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x);
-            float c3 = (numerator1_1-numerator1_2)/(denom1_1-denom1_2);
-            float ttc3 = 1/c3;
+//            double numerator0_1 = (-sum_g_et*sum_g_squared_x_y)/(1e16);
+//            numerator0_1 += (sum_g_y_et*sum_g_squared_x)/(1e16);
+            double numerator1_1 = (-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y);
+            Log.w("terms1", String.valueOf(-sum_g_et*sum_g_squared_x_y));
+            Log.w("terms2", String.valueOf(sum_g_y_et*sum_g_squared_x));
+            Log.w("terms3", String.valueOf(sum_g_squared_y_squared*sum_g_squared_x_squared));
+            Log.w("terms4", String.valueOf(sum_g_squared_x_y*sum_g_squared_x_y));
+            Log.w("terms5", String.valueOf((-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)));
+            Log.w("terms6", String.valueOf((sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y)));
+            Log.w("terms7", String.valueOf(numerator1_1));
+            double numerator1_2 = (-sum_g_y_et*sum_g_squared_x_squared+sum_g_x_et*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x_squared);
+            Log.w("method3 numerator", String.valueOf(numerator1_1 - numerator1_2));
+            double denom1_1 = (sum_g_squared*sum_g_squared_x_y-sum_g_squared_y*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared - sum_g_squared_x_y*sum_g_squared_x_y);
+            double denom1_2 = (sum_g_squared_y*sum_g_squared_x_squared-sum_g_squared_x*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x);
+            Log.w("method3 denominator", String.valueOf(numerator1_1 - numerator1_2));
+            double c3 = (numerator1_1-numerator1_2)/(denom1_1-denom1_2);
+            Log.w("method3 c", String.valueOf(c3));
+            double ttc3 = 1/c3;
 
             float sum = 0;
             for (int i=0; i < nPixels; i++) {
@@ -369,36 +390,22 @@ public class MainActivity extends Activity
 			int newImageWidth = canvasWidth - 200;
 			int marginWidth = (canvasWidth - newImageWidth) / 2;
 
-			// Draw mean (truncate to integer) text on screen
-			String imageMeanStr = "Mean    (R,G,B): " + String.format("%4d", (int) redMean) + ", " +
-								  String.format("%4d", (int) greenMean) + ", " + String.format("%4d", (int) blueMean);
-			drawTextOnBlack(canvas, imageMeanStr, marginWidth+10, mLeading, mPaintYellow);
-			// Draw standard deviation (truncate to integer) text on screen
-			String imageStdDevStr = "Std Dev (R,G,B): " + String.format("%4d", (int) redStdDev) + ", " +
-									String.format("%4d", (int) greenStdDev) + ", " + String.format("%4d", (int) blueStdDev);
-			drawTextOnBlack(canvas, imageStdDevStr, marginWidth+10, 2 * mLeading, mPaintYellow);
             String imageBrightnessStr = "Brightness: " + String.format("%s", (float) brightnessMean);
-            drawTextOnBlack(canvas, imageBrightnessStr, marginWidth+10, 3 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, imageBrightnessStr, marginWidth+10, 1 * mLeading, mPaintYellow);
             String imageBrightnessDeltaStr = "PrevBrightnessMean: " + String.format("%s", (float) prevBrightnessMean);
-            drawTextOnBlack(canvas, imageBrightnessDeltaStr, marginWidth+10, 4 * mLeading, mPaintGreen);
-//            String brightnessDeltaMeanStr = "BrightnessDeltaMean: " + String.format("%s", (float) brightnessDeltaMean);
-//            drawTextOnBlack(canvas, brightnessDeltaMeanStr, marginWidth+10, 5 * mLeading, mPaintGreen);
-            drawTextOnBlack(canvas, String.format("%s", ttc), marginWidth+10, 5 * mLeading, mPaintGreen);
-            drawTextOnBlack(canvas, String.format("%s", ttc2), marginWidth+10, 6 * mLeading, mPaintGreen);
-            drawTextOnBlack(canvas, String.format("%s", ttc3), marginWidth+10, 7 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, imageBrightnessDeltaStr, marginWidth+10, 2 * mLeading, mPaintYellow);
+            drawTextOnBlack(canvas, "TTC1: " + String.format("%s", ttc), marginWidth+10, 3 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, "TTC2: " + String.format("%s", ttc2), marginWidth+10, 4 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, "TTC3: " + String.format("%s", ttc3), marginWidth+10, 5 * mLeading, mPaintGreen);
 
 
-//            String counterStr = String.format("%4d", (int) counter);
-//            drawTextOnBlack(canvas, counterStr, marginWidth + 10, 6 * mLeading, mPaintGreen);
-
-			float barWidth = ((float) newImageWidth) / 256;
-			// Draw red intensity histogram
-			drawHistogram(canvas, mPaintRed, mRedHistogram, nPixels, canvasHeight - 2*100, marginWidth, barWidth);
-			// Draw green intensity histogram
-            drawHistogram(canvas, mPaintGreen, mGreenHistogram, nPixels, canvasHeight - 100, marginWidth, barWidth);
-            // Draw blue intensity histogram
-            drawHistogram(canvas, mPaintBlue, mBlueHistogram, nPixels, canvasHeight, marginWidth, barWidth);
-
+			float barWidth = ((float) newImageWidth) / 25;
+            int left1 = (int) (newImageWidth - 3*marginWidth - 3*barWidth);
+            int left2 = (int) (newImageWidth - 2*marginWidth - 2*barWidth);
+            int left3 = (int) (newImageWidth - marginWidth - barWidth);
+            drawTTCBar(canvas, mPaintRed, ttc, canvasHeight, left1, barWidth);
+            drawTTCBar(canvas, mPaintYellow, ttc2, canvasHeight, left2, barWidth);
+            drawTTCBar(canvas, mPaintGreen, (float) ttc3, canvasHeight, left3*50, barWidth);
             super.onDraw(canvas);
 
 		} // end onDraw method
@@ -535,6 +542,21 @@ public class MainActivity extends Activity
 				barRect.right += barWidth;
 			}
 		}
+
+        void drawTTCBar (Canvas canvas, Paint mPaint, float ttc, int mBottom, int barLeft, float barWidth)
+        {
+            float barMaxHeight = 10; // controls vertical scale of histogram
+            float barMarginHeight = 2;
+
+            if (ttc < 0) {
+                ttc = 0;
+            }
+            barRect.bottom = mBottom;
+            barRect.left = barLeft;
+            barRect.right = barRect.left + barWidth;
+            barRect.top = barRect.bottom - Math.min(600, ttc * barMaxHeight) - barMarginHeight;
+            canvas.drawRect(barRect, mPaint);
+        }
 	}
 
 
