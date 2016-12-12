@@ -442,8 +442,7 @@ public class MainActivity extends Activity
             drawTextOnBlack(canvas, "TTC1: " + String.format("%s", ttc), marginWidth+10, 1 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "TTC2: " + String.format("%s", ttc2), marginWidth+10, 2 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "TTC3: " + String.format("%s", ttc3), marginWidth+10, 3 * mLeading, mPaintGreen);
-            drawTextOnBlack(canvas, "FOE_x: " + String.format("%s", x_0), marginWidth+10, 4 * mLeading, mPaintRed);
-            drawTextOnBlack(canvas, "FOE_y: " + String.format("%s", y_0), marginWidth+10, 5 * mLeading, mPaintRed);
+            drawTextOnBlack(canvas, "FOE: (" + String.format("%s", x_0) + ", " + String.format("%s", y_0) + ")", marginWidth+10, 4 * mLeading, mPaintRed);
 
 
 			float barWidth = ((float) newImageWidth) / 25;
@@ -563,10 +562,9 @@ public class MainActivity extends Activity
 
 		private void drawTextOnBlack (Canvas canvas, String str, int rPos, int cPos, Paint mPaint)
 		{ // make text stand out from background by providing thin black border
-			canvas.drawText(str, rPos - 1, cPos - 1, mPaintBlack);
-			canvas.drawText(str, rPos + 1, cPos - 1, mPaintBlack);
-			canvas.drawText(str, rPos + 1, cPos + 1, mPaintBlack);
-			canvas.drawText(str, rPos - 1, cPos + 1, mPaintBlack);
+            Typeface font = Typeface.createFromAsset(getAssets(), "fonts/sqmarket-regular.ttf");
+            mPaint.setTypeface(font);
+            mPaint.setTextSize(80f);
 			canvas.drawText(str, rPos, cPos, mPaint);
 		}
 
