@@ -312,6 +312,8 @@ public class MainActivity extends Activity
 
             int newX = -1;
             int newY;
+            float avgE_t = 0;
+            float maxE_t = 0;
             for (int a=0; a < 480; a=a+4) {
                 newY = -1;
                 newX++;
@@ -335,8 +337,15 @@ public class MainActivity extends Activity
                     subE_x[newX][newY] = xAvg;
                     subE_y[newX][newY] = yAvg;
                     subE_t[newX][newY] = tAvg;
+                    avgE_t += tAvg;
+                    maxE_t = Math.max(Math.abs(tAvg), maxE_t);
                 }
             }
+
+            avgE_t /=(120*160);
+            Log.w("Average E_t", String.valueOf(avgE_t));
+            Log.w("Max E_t", String.valueOf(maxE_t));
+            float E_threshold = Math.abs(avgE_t);
 
             float ttc_sum = 0;
             float sum_g_squared = 0;
@@ -358,24 +367,26 @@ public class MainActivity extends Activity
 
             for (int a=0; a < 120; a++){
                 for (int b=0; b < 160; b++){
-                    float G = (a/1)*subE_x[a][b] + (b/1)*subE_y[a][b];
-                    ttc_sum += G;
-                    sum_g_squared += G*G;
-                    sum_ex_ey += subE_x[a][b] * subE_y[a][b];
-                    sum_g_ex += G * subE_x[a][b];
-                    sum_g_ey += G * subE_y[a][b];
-                    sum_g_et += G * subE_t[a][b];
-                    sum_ex_squared += subE_x[a][b] * subE_x[a][b];
-                    sum_ey_squared += subE_y[a][b] * subE_y[a][b];
-                    sum_ey_et += subE_y[a][b] * subE_t[a][b];
-                    sum_ex_et += subE_x[a][b] * subE_t[a][b];
-                    sum_g_squared_x_y += G * G * (a/1) * (b/1);
-                    sum_g_x_et += G * (a/1) * subE_t[a][b];
-                    sum_g_y_et += G * (b/1) * subE_t[a][b];
-                    sum_g_squared_x += G * G * (a/1);
-                    sum_g_squared_y += G * G * (b/1);
-                    sum_g_squared_x_squared += G * G * (a/1) * (a/1);
-                    sum_g_squared_y_squared += G * G * (b/1) * (b/1);
+                    if (Math.abs(subE_y[a][b]) > E_threshold) {
+                        float G = (a / 1) * subE_x[a][b] + (b / 1) * subE_y[a][b];
+                        ttc_sum += G;
+                        sum_g_squared += G * G;
+                        sum_ex_ey += subE_x[a][b] * subE_y[a][b];
+                        sum_g_ex += G * subE_x[a][b];
+                        sum_g_ey += G * subE_y[a][b];
+                        sum_g_et += G * subE_t[a][b];
+                        sum_ex_squared += subE_x[a][b] * subE_x[a][b];
+                        sum_ey_squared += subE_y[a][b] * subE_y[a][b];
+                        sum_ey_et += subE_y[a][b] * subE_t[a][b];
+                        sum_ex_et += subE_x[a][b] * subE_t[a][b];
+                        sum_g_squared_x_y += G * G * (a / 1) * (b / 1);
+                        sum_g_x_et += G * (a / 1) * subE_t[a][b];
+                        sum_g_y_et += G * (b / 1) * subE_t[a][b];
+                        sum_g_squared_x += G * G * (a / 1);
+                        sum_g_squared_y += G * G * (b / 1);
+                        sum_g_squared_x_squared += G * G * (a / 1) * (a / 1);
+                        sum_g_squared_y_squared += G * G * (b / 1) * (b / 1);
+                    }
                 }
             }
 
@@ -450,7 +461,7 @@ public class MainActivity extends Activity
             int left2 = (int) (newImageWidth - 2*marginWidth - 2*barWidth);
             int left3 = (int) (newImageWidth - marginWidth - barWidth);
             drawTTCBar(canvas, mPaintRed, ttc, canvasHeight, left1, barWidth);
-            drawTTCBar(canvas, mPaintYellow, ttc2, canvasHeight, left2, barWidth);
+            drawTTCBar(canvas, mPaintYellow, ttc2/10, canvasHeight, left2, barWidth);
             drawTTCBar(canvas, mPaintGreen, (float) ttc3*1000, canvasHeight, left3, barWidth);
             drawFOE(canvas, mPaintRed, x_0, y_0, canvasHeight, newImageWidth);
             super.onDraw(canvas);
