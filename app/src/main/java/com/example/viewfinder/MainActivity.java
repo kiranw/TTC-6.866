@@ -167,7 +167,7 @@ public class MainActivity extends Activity
 
 	class DrawOnTop extends View
 	{
-        int counter;
+        int frame;
         Bitmap mBitmap;
         byte[] mYUVData;
         int[] mRGBData;
@@ -209,7 +209,7 @@ public class MainActivity extends Activity
 		{ // constructor
             super(context);
 
-            counter = 0;
+            frame = 0;
             brightness = new float[480*640];
             prevBrightness = new float[480*640];
 
@@ -270,13 +270,13 @@ public class MainActivity extends Activity
 				return;	// because not yet set up
 			}
 
-            if (counter > 1) {
+            if (frame > 1) {
                 prevBrightness = new float[480*640];
                 System.arraycopy( brightness, 0, prevBrightness, 0, 480*640);
             }
 
-            counter += 1;
-            Log.w(TAG, "counter: " + String.format("%4d", (int) counter));
+            frame += 1;
+            Log.w(TAG, "frame: " + String.format("%4d", (int) frame));
 
 			// Convert image from YUV to RGB format:
 			//decodeYUV420SP(mRGBData, brightness, mYUVData, mImageWidth, mImageHeight);
@@ -302,9 +302,9 @@ public class MainActivity extends Activity
             // calculate differences in brightness
             for (int a=0; a < 480; a++) {
                 for (int b = 0; b < 640; b++) {
-                    prevE_x[a][b] = (counter > 1) ? E_x[a][b] : 0;
-                    prevE_y[a][b] = (counter > 1) ? E_y[a][b] : 0;
-                    prevE_t[a][b] = (counter > 1) ? E_t[a][b] : 0;
+                    prevE_x[a][b] = (frame > 1) ? E_x[a][b] : 0;
+                    prevE_y[a][b] = (frame > 1) ? E_y[a][b] : 0;
+                    prevE_t[a][b] = (frame > 1) ? E_t[a][b] : 0;
                     E_x[a][b] = (a == 479) ? 0 : E[a][b] - E[a + 1][b];
                     E_y[a][b] = (b == 639) ? 0 : E[a][b] - E[a][b + 1];
                     E_t[a][b] = E[a][b] - prevE[a][b];
@@ -355,7 +355,8 @@ public class MainActivity extends Activity
 
             float E_threshold = Math.abs(avgE_t)/2;
 
-            float ttc_sum = 0;
+
+            //compute summations
             float sum_g_squared = 0;
             float sum_ex_ey = 0;
             float sum_g_ex = 0;
@@ -372,12 +373,12 @@ public class MainActivity extends Activity
             float sum_g_squared_y = 0;
             float sum_g_squared_x_squared = 0;
             float sum_g_squared_y_squared = 0;
-
+            int x_offset = 60; // adjust coordinate system
+            int y_offset = 80; // adjust coordinate system
             for (int a=0; a < 120; a++){
                 for (int b=0; b < 160; b++){
                     //if (Math.abs(subE_y[a][b]) > E_threshold) {
-                    float G = (a / 1) * subE_x[a][b] + (b / 1) * subE_y[a][b];
-                    ttc_sum += G;
+                    float G = ((a-x_offset) / 1) * subE_x[a][b] + ((b-y_offset) / 1) * subE_y[a][b];
                     sum_g_squared += G * G;
                     sum_ex_ey += subE_x[a][b] * subE_y[a][b];
                     sum_g_ex += G * subE_x[a][b];
@@ -387,21 +388,21 @@ public class MainActivity extends Activity
                     sum_ey_squared += subE_y[a][b] * subE_y[a][b];
                     sum_ey_et += subE_y[a][b] * subE_t[a][b];
                     sum_ex_et += subE_x[a][b] * subE_t[a][b];
-                    sum_g_squared_x_y += G * G * (a / 1) * (b / 1);
-                    sum_g_x_et += G * (a / 1) * subE_t[a][b];
-                    sum_g_y_et += G * (b / 1) * subE_t[a][b];
-                    sum_g_squared_x += G * G * (a / 1);
-                    sum_g_squared_y += G * G * (b / 1);
-                    sum_g_squared_x_squared += G * G * (a / 1) * (a / 1);
-                    sum_g_squared_y_squared += G * G * (b / 1) * (b / 1);
+                    sum_g_squared_x_y += G * G * ((a-x_offset) / 1) * ((b-y_offset) / 1);
+                    sum_g_x_et += G * ((a-x_offset) / 1) * subE_t[a][b];
+                    sum_g_y_et += G * ((b-y_offset) / 1) * subE_t[a][b];
+                    sum_g_squared_x += G * G * ((a-x_offset) / 1);
+                    sum_g_squared_y += G * G * ((b-y_offset) / 1);
+                    sum_g_squared_x_squared += G * G * ((a-x_offset) / 1) * ((a-x_offset) / 1);
+                    sum_g_squared_y_squared += G * G * ((b-y_offset) / 1) * ((b-y_offset) / 1);
                     //}
                 }
             }
 
-            //method 1
+            //case 1
             float ttc = - sum_g_squared / sum_g_et;
 
-            //method 2
+            //case 2
             float n1_c2 = (-sum_g_et*sum_ex_ey + sum_ey_et*sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
             float n2_c2 = (-sum_ey_et * sum_ex_squared + sum_ex_et * sum_ex_ey)*(sum_g_ey*sum_ex_ey - sum_ey_squared*sum_g_ex);
             float d1_c2 = (sum_g_squared*sum_ex_ey - sum_g_ey * sum_g_ex)*(sum_ex_squared*sum_ey_squared-(sum_ex_ey*sum_ex_ey));
@@ -434,7 +435,7 @@ public class MainActivity extends Activity
             float y_0 = -b2_1 / c2;
 
 
-            //method 3
+            //case 3
             double numerator1_1 = (-sum_g_et*sum_g_squared_x_y + sum_g_y_et*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared-sum_g_squared_x_y*sum_g_squared_x_y);
             double numerator1_2 = (-sum_g_y_et*sum_g_squared_x_squared+sum_g_x_et*sum_g_squared_x_y)*(sum_g_squared_y*sum_g_squared_x_y-sum_g_squared_y_squared*sum_g_squared_x_squared);
             double denom1_1 = (sum_g_squared*sum_g_squared_x_y-sum_g_squared_y*sum_g_squared_x)*(sum_g_squared_y_squared*sum_g_squared_x_squared - sum_g_squared_x_y*sum_g_squared_x_y);
@@ -442,10 +443,10 @@ public class MainActivity extends Activity
             double c3 = (numerator1_1-numerator1_2)/(denom1_1-denom1_2);
             double ttc3 = 1/c3;
 
-            if (counter > 330){
-                TTC1 += String.format("%.2f", ttc)+ ", " + String.valueOf(counter)+ "; ";
-                TTC2 += String.format("%.2f", ttc2)+ ", " + String.valueOf(counter)+ "; ";
-                TTC3 += String.format("%.2f", ttc3)+ ", " + String.valueOf(counter)+ "; ";
+            if (frame > 330){
+                TTC1 += String.format("%.2f", ttc)+ ", " + String.valueOf(frame)+ "; ";
+                TTC2 += String.format("%.2f", ttc2)+ ", " + String.valueOf(frame)+ "; ";
+                TTC3 += String.format("%.2f", ttc3)+ ", " + String.valueOf(frame)+ "; ";
             }
             else {
                 TTC1 += String.format("%.2f", ttc)+ "; ";
@@ -453,6 +454,8 @@ public class MainActivity extends Activity
                 TTC3 += String.format("%.2f", ttc3)+ "; ";
             }
 
+            // To produce the TTC vs frame number graph in our report, we scaled the TTC values by a constant (-150),
+            // and we hadn't adjusted the coordinate system yet
             Log.w("TTC1", TTC1);
             Log.w("TTC2", TTC2);
             Log.w("TTC3", TTC3);
@@ -477,7 +480,7 @@ public class MainActivity extends Activity
             drawTextOnBlack(canvas, "TTC2: " + String.format("%s", ttc2), marginWidth+10, 2 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "TTC3: " + String.format("%s", ttc3), marginWidth+10, 3 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "FOE: (" + String.format("%s", x_0) + ", " + String.format("%s", y_0) + ")", marginWidth+10, 4 * mLeading, mPaintRed);
-            drawTextOnBlack(canvas, "counter: " + String.format("%4d", counter), marginWidth+10, 5 * mLeading, mPaintGreen);
+            drawTextOnBlack(canvas, "frame: " + String.format("%4d", frame), marginWidth+10, 5 * mLeading, mPaintGreen);
 
 			float barWidth = ((float) newImageWidth) / 25;
             int left1 = (int) (newImageWidth - 3*marginWidth - 3*barWidth);
@@ -768,7 +771,7 @@ public class MainActivity extends Activity
 		{
 			String TAG="setupArrays";
 			if (DBG) Log.i(TAG, "Setting up arrays");
-//            mDrawOnTop.counter += 1;
+//            mDrawOnTop.frame += 1;
 //            mDrawOnTop.prevBrightness = mDrawOnTop.brightness;
 //            mDrawOnTop.brightness = new float[mDrawOnTop.mImageWidth * mDrawOnTop.mImageHeight];
 
