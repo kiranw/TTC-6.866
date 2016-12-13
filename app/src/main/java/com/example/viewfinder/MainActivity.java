@@ -200,8 +200,12 @@ public class MainActivity extends Activity
         int totalBrightness;
         float prevBrightnessMean;
 		String TAG = "DrawOnTop";       // for logcat output
+        String TTC1;
+        String TTC2;
+        String TTC3;
 
-		public DrawOnTop (Context context)
+
+        public DrawOnTop (Context context)
 		{ // constructor
             super(context);
 
@@ -237,6 +241,9 @@ public class MainActivity extends Activity
 			if (DBG) Log.i(TAG, "DrawOnTop textsize " + mTextsize);
 			mLeading = mTextsize * 6 / 5;    // adjust line spacing
 			if (DBG) Log.i(TAG, "DrawOnTop Leading " + mLeading);
+            TTC1 = "TTC1: ";
+            TTC2 = "TTC2: ";
+            TTC3 = "TTC3: ";
 
         }
 
@@ -345,7 +352,8 @@ public class MainActivity extends Activity
             avgE_t /=(120*160);
             Log.w("Average E_t", String.valueOf(avgE_t));
             Log.w("Max E_t", String.valueOf(maxE_t));
-            float E_threshold = Math.abs(avgE_t);
+
+            float E_threshold = Math.abs(avgE_t)/2;
 
             float ttc_sum = 0;
             float sum_g_squared = 0;
@@ -367,26 +375,26 @@ public class MainActivity extends Activity
 
             for (int a=0; a < 120; a++){
                 for (int b=0; b < 160; b++){
-                    if (Math.abs(subE_y[a][b]) > E_threshold) {
-                        float G = (a / 1) * subE_x[a][b] + (b / 1) * subE_y[a][b];
-                        ttc_sum += G;
-                        sum_g_squared += G * G;
-                        sum_ex_ey += subE_x[a][b] * subE_y[a][b];
-                        sum_g_ex += G * subE_x[a][b];
-                        sum_g_ey += G * subE_y[a][b];
-                        sum_g_et += G * subE_t[a][b];
-                        sum_ex_squared += subE_x[a][b] * subE_x[a][b];
-                        sum_ey_squared += subE_y[a][b] * subE_y[a][b];
-                        sum_ey_et += subE_y[a][b] * subE_t[a][b];
-                        sum_ex_et += subE_x[a][b] * subE_t[a][b];
-                        sum_g_squared_x_y += G * G * (a / 1) * (b / 1);
-                        sum_g_x_et += G * (a / 1) * subE_t[a][b];
-                        sum_g_y_et += G * (b / 1) * subE_t[a][b];
-                        sum_g_squared_x += G * G * (a / 1);
-                        sum_g_squared_y += G * G * (b / 1);
-                        sum_g_squared_x_squared += G * G * (a / 1) * (a / 1);
-                        sum_g_squared_y_squared += G * G * (b / 1) * (b / 1);
-                    }
+                    //if (Math.abs(subE_y[a][b]) > E_threshold) {
+                    float G = (a / 1) * subE_x[a][b] + (b / 1) * subE_y[a][b];
+                    ttc_sum += G;
+                    sum_g_squared += G * G;
+                    sum_ex_ey += subE_x[a][b] * subE_y[a][b];
+                    sum_g_ex += G * subE_x[a][b];
+                    sum_g_ey += G * subE_y[a][b];
+                    sum_g_et += G * subE_t[a][b];
+                    sum_ex_squared += subE_x[a][b] * subE_x[a][b];
+                    sum_ey_squared += subE_y[a][b] * subE_y[a][b];
+                    sum_ey_et += subE_y[a][b] * subE_t[a][b];
+                    sum_ex_et += subE_x[a][b] * subE_t[a][b];
+                    sum_g_squared_x_y += G * G * (a / 1) * (b / 1);
+                    sum_g_x_et += G * (a / 1) * subE_t[a][b];
+                    sum_g_y_et += G * (b / 1) * subE_t[a][b];
+                    sum_g_squared_x += G * G * (a / 1);
+                    sum_g_squared_y += G * G * (b / 1);
+                    sum_g_squared_x_squared += G * G * (a / 1) * (a / 1);
+                    sum_g_squared_y_squared += G * G * (b / 1) * (b / 1);
+                    //}
                 }
             }
 
@@ -434,6 +442,21 @@ public class MainActivity extends Activity
             double c3 = (numerator1_1-numerator1_2)/(denom1_1-denom1_2);
             double ttc3 = 1/c3;
 
+            if (counter > 330){
+                TTC1 += String.format("%.2f", ttc)+ ", " + String.valueOf(counter)+ "; ";
+                TTC2 += String.format("%.2f", ttc2)+ ", " + String.valueOf(counter)+ "; ";
+                TTC3 += String.format("%.2f", ttc3)+ ", " + String.valueOf(counter)+ "; ";
+            }
+            else {
+                TTC1 += String.format("%.2f", ttc)+ "; ";
+                TTC2 += String.format("%.2f", ttc2)+ "; ";
+                TTC3 += String.format("%.2f", ttc3)+ "; ";
+            }
+
+            Log.w("TTC1", TTC1);
+            Log.w("TTC2", TTC2);
+            Log.w("TTC3", TTC3);
+
             float sum = 0;
             for (int i=0; i < nPixels; i++) {
                 sum = sum + prevBrightness[i];
@@ -454,7 +477,7 @@ public class MainActivity extends Activity
             drawTextOnBlack(canvas, "TTC2: " + String.format("%s", ttc2), marginWidth+10, 2 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "TTC3: " + String.format("%s", ttc3), marginWidth+10, 3 * mLeading, mPaintGreen);
             drawTextOnBlack(canvas, "FOE: (" + String.format("%s", x_0) + ", " + String.format("%s", y_0) + ")", marginWidth+10, 4 * mLeading, mPaintRed);
-
+            drawTextOnBlack(canvas, "counter: " + String.format("%4d", counter), marginWidth+10, 5 * mLeading, mPaintGreen);
 
 			float barWidth = ((float) newImageWidth) / 25;
             int left1 = (int) (newImageWidth - 3*marginWidth - 3*barWidth);
